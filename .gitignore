@@ -1,0 +1,10 @@
+# 日志文件
+*.log
+# python缓存
+__pycache__/
+*.pyc
+# 虚拟环境
+.venv/
+venv/
+# 系统垃圾
+.DS_Store
