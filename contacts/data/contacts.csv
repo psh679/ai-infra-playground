@@ -1,0 +1,5 @@
+id,name,phone,email,address,note
+1,Alice,13800138000,alice@example.com,Beijing,Friend
+2,Bob,+86-13900000000,bob@example.com,Shanghai,Colleague
+3,Charlie,18000000000,charlie@example.com,Hangzhou,Client
+4,Diana,15000000000,diana@example.com,Shenzhen,Partner
