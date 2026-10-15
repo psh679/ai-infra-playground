@@ -1,0 +1,92 @@
+from pathlib import Path
+import csv
+import sqlite3
+from typing import List, Dict
+
+DB_PATH = Path(__file__).resolve().parent / "contacts.db"
+CSV_PATH = Path(__file__).resolve().parents[2] / "contacts" / "data" / "contacts.csv"
+
+
+def get_conn():
+    conn = sqlite3.connect(str(DB_PATH))
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def import_contacts_from_csv():
+    if not CSV_PATH.exists():
+        return False
+
+    rows = []
+    with CSV_PATH.open("r", newline="", encoding="utf-8") as csv_file:
+        reader = csv.DictReader(csv_file)
+        for row in reader:
+            rows.append(
+                (
+                    int(row.get("id", 0)),
+                    row.get("name", "").strip(),
+                    row.get("phone", "").strip(),
+                    row.get("email", "").strip(),
+                    row.get("address", "").strip(),
+                    row.get("note", "").strip(),
+                )
+            )
+
+    if not rows:
+        return False
+
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.executemany(
+        "INSERT INTO contacts (id, name, phone, email, address, note) VALUES (?, ?, ?, ?, ?, ?)",
+        rows,
+    )
+    conn.commit()
+    conn.close()
+    return True
+
+
+def init_db():
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute(
+        """
+        CREATE TABLE IF NOT EXISTS contacts (
+            id INTEGER PRIMARY KEY,
+            name TEXT NOT NULL,
+            phone TEXT NOT NULL,
+            email TEXT NOT NULL,
+            address TEXT DEFAULT '',
+            note TEXT DEFAULT ''
+        )
+        """
+    )
+    conn.commit()
+    cur.execute("SELECT COUNT(*) as cnt FROM contacts")
+    row = cur.fetchone()
+    cnt = row[0] if row is not None else 0
+
+    if cnt == 0:
+        if CSV_PATH.exists():
+            import_contacts_from_csv()
+        else:
+            cur.executemany(
+                "INSERT INTO contacts (id, name, phone, email, address, note) VALUES (?, ?, ?, ?, ?, ?)",
+                [
+                    (1, "Alice", "13800138000", "alice@example.com", "Beijing", "Friend"),
+                    (2, "Bob", "+86-13900000000", "bob@example.com", "Shanghai", "Colleague"),
+                ],
+            )
+            conn.commit()
+
+    conn.close()
+
+
+def get_all_contacts() -> List[Dict]:
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("SELECT id, name, phone, email, address, note FROM contacts ORDER BY id")
+    rows = cur.fetchall()
+    conn.close()
+    return [dict(row) for row in rows]
