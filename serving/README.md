@@ -1,68 +1,31 @@
 # Simple FastAPI Serving (AI Infra Day 2)
 
-## Purpose
+## Purpose:
+- Minimal FastAPI app to demonstrate a service.
+- Endpoints:
+  - `GET /` -> hello message
+  - `GET /health` -> health check
+  - `GET /contacts` -> sample contacts JSON
 
-This project is a minimal FastAPI application designed to demonstrate a basic service layer in a modern software architecture.
-
-It includes:
-
-- a lightweight HTTP API
-- health checks
-- contact data access through SQLite
-- a clean foundation for future integration with C-based logic or CSV-based inputs
-
-## Endpoints
-
-- `GET /` -> returns a hello message
-- `GET /health` -> returns application health status
-- `GET /contacts` -> returns contacts stored in SQLite
-
-## How to run locally
-
-### Windows
-
-1. Ensure Python 3.8+ is installed
-
-```bash
+## How to run (Windows):
+1. Ensure Python 3.8+ is installed. Check:
 python --version
-```
+If not installed, download from https://www.python.org/downloads/ and install.
 
-2. Create a virtual environment and activate it
+2. Create virtualenv and activate:
+python -m venv .venv .venv\Scripts\activate
 
-```bash
-python -m venv .venv
-.venv\Scripts\activate
-```
-
-3. Install dependencies
-
-```bash
+3. Install dependencies:
 pip install -r requirements.txt
-```
 
-4. Start the server
-
-```bash
+4. Run the app:
 uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
-```
 
-5. Test the service
+5. Test endpoints:
+- Open http://127.0.0.1:8000 in browser
+- Health: http://127.0.0.1:8000/health
+- Contacts: http://127.0.0.1:8000/contacts
 
-- http://127.0.0.1:8000/
-- http://127.0.0.1:8000/health
-- http://127.0.0.1:8000/contacts
+Notes:
+- Later we'll replace SAMPLE_CONTACTS with real data backend (SQLite or your C program via wrapper).
 
-## Docker
-
-You can also run the service in Docker:
-
-```bash
-docker build -t ai-infra-playground .
-docker run --rm -p 8000:8000 ai-infra-playground
-```
-
-## Notes
-
-- The app creates and initializes a SQLite database automatically on startup.
-- This is a learning-focused setup intended to be expanded later with real data sources, CSV ingestion, or C program integration.
-- The service layer intentionally stays simple so that the architecture is easy to understand and extend.
